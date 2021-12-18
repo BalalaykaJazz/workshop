@@ -16,13 +16,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	path := cfg.Host + ":" + cfg.Port
+
 	h := handler.NewHandler()
 	r := chi.NewRouter()
 
 	r.Get("/hello", h.Hello)
 
-	log.Println("Starting server")
-	err = http.ListenAndServe(":8080", r)
+	log.Printf("starting server at %s", path)
+	err = http.ListenAndServe(path, r)
 	//if err != nil {
 	log.Fatal(err)
 	//}
