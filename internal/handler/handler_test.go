@@ -10,6 +10,7 @@ import (
 )
 
 func TestHandler_Hello(t *testing.T) {
+
 	tests := []struct {
 		name     string
 		joke     *api.JokeResponse
@@ -28,9 +29,10 @@ func TestHandler_Hello(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			apiMock := &mocks.Client{}
-			apiMock.On("GetJoke").Return(tt.joke, tt.err)
+			apiMock.On("GetJoke").
+				Return(tt.joke, tt.err)
 
-			h := NewHandler(apiMock)
+			h := NewHandler(apiMock, "")
 
 			req, _ := http.NewRequest("GET", "/hello", nil)
 			rr := httptest.NewRecorder()
@@ -47,6 +49,7 @@ func TestHandler_Hello(t *testing.T) {
 			if status := rr.Result().StatusCode; status != tt.codeWant {
 				t.Errorf("wrong respode status %d want %d", status, tt.codeWant)
 			}
+
 		})
 	}
 }

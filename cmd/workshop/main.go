@@ -19,7 +19,7 @@ func main() {
 
 	apiClient := jokes.NewJokeClient(cfg.JokeURL)
 
-	h := handler.NewHandler(apiClient)
+	h := handler.NewHandler(apiClient, cfg.CustomJoke)
 	r := chi.NewRouter()
 
 	r.Get("/hello", h.Hello)
@@ -31,5 +31,5 @@ func main() {
 	log.Fatal(err)
 	//}
 
-	log.Println("Server stop")
+	//log.Println("Server stop")
 }
