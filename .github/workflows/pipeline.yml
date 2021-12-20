@@ -14,11 +14,34 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2
 
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v1
+        with:
+          go-version: 1.17
+
+      - name: Run test
+        run: go mod tidy && go test ./...
+
+      - name: Run test with coverage
+        run: go mod tidy && go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+      - name: Upload Coverage report to CodeCov
+        uses: codecov/codecov-action@v1.0.0
+        with:
+          file: ./coverage.txt
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: no
+
   deploy:
     name: Deploy on Heroku
     runs-on: ubuntu-latest
     needs:
       - lint
+      - test
     steps:
       - uses: actions/checkout@v2
       - name: Login to Heroku Container registry
