@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"github.com/go-chi/chi"
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	"workshop/internal/api/jokes"
 	"workshop/internal/config"
 	"workshop/internal/handler"
@@ -25,11 +30,22 @@ func main() {
 	r.Get("/hello", h.Hello)
 	path := cfg.Host + ":" + cfg.Port
 
-	log.Printf("starting server at %s", path)
-	err = http.ListenAndServe(path, r)
-	//if err != nil {
-	log.Fatal(err)
-	//}
+	srv := &http.Server{Addr: path, Handler: r}
 
-	//log.Println("Server stop")
+	quit := make(chan os.Signal, 1)
+	done := make(chan error, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-quit
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		defer cancel()
+		done <- srv.Shutdown(ctx)
+	}()
+
+	log.Printf("starting server at %s", path)
+	_ = srv.ListenAndServe()
+
+	err = <-done
+	log.Printf("Server stop %v\n", err)
 }
