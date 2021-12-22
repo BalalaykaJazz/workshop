@@ -15,9 +15,9 @@ func NewHandler(jokeClient api.Client, customJoke string) *Handler {
 	return &Handler{jokeClient: jokeClient, customJoke: customJoke}
 }
 
-func (h *Handler) Hello(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Hello(w http.ResponseWriter, _ *http.Request) {
 	if h.customJoke != "" {
-		fmt.Fprint(w, h.customJoke)
+		_, _ = fmt.Fprint(w, h.customJoke)
 		return
 	}
 
@@ -27,5 +27,5 @@ func (h *Handler) Hello(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprint(w, joke.Joke)
+	_, _ = fmt.Fprint(w, joke.Joke)
 }
